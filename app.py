@@ -1,37 +1,58 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
+import os
 
 app = Flask(__name__)
 CORS(app)
 
+# file path
+DATA_FILE = "products.json"
+
+
 # load products
 def load_products():
-    try:
-        with open("products.json", "r") as f:
-            return json.load(f)
-    except:
+    if not os.path.exists(DATA_FILE):
         return []
+    with open(DATA_FILE, "r") as f:
+        try:
+            return json.load(f)
+        except:
+            return []
+
 
 # save products
-def save_products(data):
-    with open("products.json", "w") as f:
-        json.dump(data, f)
+def save_products(products):
+    with open(DATA_FILE, "w") as f:
+        json.dump(products, f)
+
 
 # GET products
 @app.route('/products', methods=['GET'])
 def get_products():
     return jsonify(load_products())
 
-# ADD PRODUCT (FIXED)
-@app.route('/add-product', methods=['POST'])
+
+# ADD product
+@app.route('/add_product', methods=['POST'])
 def add_product():
     try:
         data = request.get_json()
 
-        name = data.get('name')
-        price = int(data.get('price'))
-        stock = int(data.get('stock'))
+        name = data.get('name', '')
+        price = data.get('price', 0)
+        stock = data.get('stock', 0)
+
+        # safe conversion
+        try:
+            price = int(price)
+        except:
+            price = 0
+
+        try:
+            stock = int(stock)
+        except:
+            stock = 0
 
         products = load_products()
 
@@ -45,12 +66,13 @@ def add_product():
         products.append(new_product)
         save_products(products)
 
-        return jsonify({"message": "Product added"})
+        return jsonify({"message": "Product added successfully"})
 
     except Exception as e:
         print("ERROR:", e)
         return jsonify({"error": str(e)}), 500
 
 
-if __name__ == "__main__":
-    app.run()
+# run app (local only)
+if __name__ == '__main__':
+    app.run(debug=True)
