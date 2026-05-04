@@ -1,69 +1,56 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import json, os
-from datetime import date
+import json
 
 app = Flask(__name__)
 CORS(app)
 
-PRODUCT_FILE = "products.json"
-SALES_FILE = "sales.json"
-
-def load(file):
-    if not os.path.exists(file):
+# load products
+def load_products():
+    try:
+        with open("products.json", "r") as f:
+            return json.load(f)
+    except:
         return []
-    with open(file, "r") as f:
-        return json.load(f)
 
-def save(file, data):
-    with open(file, "w") as f:
+# save products
+def save_products(data):
+    with open("products.json", "w") as f:
         json.dump(data, f)
 
-@app.route('/products')
-def products():
-    return jsonify(load(PRODUCT_FILE))
+# GET products
+@app.route('/products', methods=['GET'])
+def get_products():
+    return jsonify(load_products())
 
-@app.route('/add_product', methods=['POST'])
+# ADD PRODUCT (FIXED)
+@app.route('/add-product', methods=['POST'])
 def add_product():
-    data = request.json
-    products = load(PRODUCT_FILE)
+    try:
+        data = request.get_json()
 
-    product = {
-        "id": len(products)+1,
-        "name": data['name'],
-        "stock": int(data['stock']),
-        "price": float(data['price'])
-    }
+        name = data.get('name')
+        price = int(data.get('price'))
+        stock = int(data.get('stock'))
 
-    products.append(product)
-    save(PRODUCT_FILE, products)
-    return jsonify({"msg":"added"})
+        products = load_products()
 
-@app.route('/sell', methods=['POST'])
-def sell():
-    data = request.json
-    products = load(PRODUCT_FILE)
-    sales = load(SALES_FILE)
+        new_product = {
+            "id": len(products) + 1,
+            "name": name,
+            "price": price,
+            "stock": stock
+        }
 
-    for item in data:
-        for p in products:
-            if p["id"] == item["id"]:
-                p["stock"] -= item["qty"]
+        products.append(new_product)
+        save_products(products)
 
-                sales.append({
-                    "name": p["name"],
-                    "qty": item["qty"],
-                    "total": p["price"]*item["qty"],
-                    "date": str(date.today())
-                })
+        return jsonify({"message": "Product added"})
 
-    save(PRODUCT_FILE, products)
-    save(SALES_FILE, sales)
-    return jsonify({"msg":"sold"})
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"error": str(e)}), 500
 
-@app.route('/sales')
-def get_sales():
-    return jsonify(load(SALES_FILE))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
