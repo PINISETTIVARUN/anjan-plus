@@ -1,0 +1,9 @@
+body{margin:0;font-family:Arial;background:#0f172a;color:white}
+.sidebar{width:200px;height:100vh;background:#020617;position:fixed;padding:20px}
+.sidebar a{display:block;color:white;margin:10px 0;text-decoration:none}
+.main{margin-left:220px;padding:20px}
+input,button{padding:10px;margin:5px}
+button{background:#22c55e;border:none;color:white}
+.stats{display:flex;gap:20px}
+.stat-card{background:#1e293b;padding:20px;border-radius:10px}
+.card{background:#1e293b;padding:20px;border-radius:10px}

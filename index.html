@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Home</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar">
+<a href="index.html">Home</a>
+<a href="billing.html">Billing</a>
+<a href="sales.html">Sales</a>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div class="main">
+<h1>Products</h1>
+
+<input id="name" placeholder="Name">
+<input id="stock" type="number" placeholder="Stock">
+<input id="price" type="number" placeholder="Price">
+<button onclick="addProduct()">Add</button>
+
+<div id="productList"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

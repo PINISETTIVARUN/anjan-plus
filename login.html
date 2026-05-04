@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body style="display:flex;justify-content:center;align-items:center;height:100vh;">
+
+<div class="card">
+<h2>Login</h2>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<script>
+function login(){
+let u=username.value,p=password.value;
+if(u==="admin" && p==="1234"){
+localStorage.setItem("loggedIn","true");
+location.href="index.html";
+}else alert("Wrong");
+}
+</script>
+
+</body>
+</html>

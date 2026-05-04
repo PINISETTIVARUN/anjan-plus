@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sales</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+<a href="index.html">Home</a>
+<a href="billing.html">Billing</a>
+<a href="sales.html">Sales</a>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div class="main">
+<h1>Sales</h1>
+
+<div class="stats">
+<div class="stat-card"><h3>Total Sales</h3><p id="totalSales">₹0</p></div>
+<div class="stat-card"><h3>Total Qty</h3><p id="totalQty">0</p></div>
+</div>
+
+<canvas id="salesChart"></canvas>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
