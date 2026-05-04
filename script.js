@@ -24,7 +24,7 @@ list.innerHTML+=`${p.name} ₹${p.price} (${p.stock})
 }
 
 function addProduct(){
-fetch(API+"/add_product",{method:"POST",
+fetch(API+"/add-product",{method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({name:name.value,stock:stock.value,price:price.value})
 }).then(loadProducts);
