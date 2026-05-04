@@ -2,7 +2,7 @@ if(!localStorage.getItem("loggedIn")){
 if(!location.href.includes("login.html")) location.href="login.html";
 }
 
-const API="http://127.0.0.1:5000";
+const API="https://anjan-plus-1.onrender.com";
 let cart=[],productsData=[];
 
 function logout(){
