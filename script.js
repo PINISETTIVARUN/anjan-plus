@@ -1,86 +1,97 @@
-if(!localStorage.getItem("loggedIn")){
-if(!location.href.includes("login.html")) location.href="login.html";
+const API = "https://anjan-plus-1.onrender.com";
+
+let cart = [];
+let productsData = [];
+
+// 🔹 LOAD PRODUCTS
+function loadProducts() {
+  fetch(API + "/products")
+    .then(res => res.json())
+    .then(d => {
+      productsData = d;
+
+      let list = document.getElementById("productList");
+      if (!list) return;
+
+      list.innerHTML = "";
+
+      d.forEach(p => {
+        list.innerHTML += `
+          <div style="margin:10px; padding:10px; background:#1e2a47; border-radius:8px;">
+            <b>${p.name}</b> - ₹${p.price} (Stock: ${p.stock})
+            <button onclick="addToCart(${p.id})">Add</button>
+          </div>
+        `;
+      });
+    });
 }
 
-const API="https://anjan-plus-1.onrender.com";
-let cart=[],productsData=[];
+// 🔹 ADD PRODUCT (FIXED)
+function addProduct() {
+  const name = document.getElementById("name").value;
+  const stock = document.getElementById("stock").value;
+  const price = document.getElementById("price").value;
 
-function logout(){
-localStorage.removeItem("loggedIn");
-location.href="login.html";
+  if (!name || !stock || !price) {
+    alert("Fill all fields");
+    return;
+  }
+
+  fetch(API + "/add-product", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: name,
+      stock: stock,
+      price: price
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert("✅ Product Added");
+      loadProducts();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("❌ Error adding product");
+    });
 }
 
-function loadProducts(){
-fetch(API+"/products").then(r=>r.json()).then(d=>{
-productsData=d;
-let list=document.getElementById("productList");
-if(!list)return;
-list.innerHTML="";
-d.forEach(p=>{
-list.innerHTML+=`${p.name} ₹${p.price} (${p.stock})
-<button onclick="addToCart(${p.id})">Add</button><br>`;
-});
-});
+// 🔹 ADD TO CART
+function addToCart(id) {
+  let item = cart.find(x => x.id === id);
+
+  if (item) {
+    item.qty++;
+  } else {
+    cart.push({ id, qty: 1 });
+  }
+
+  renderCart();
 }
 
-function addProduct(){
-fetch(API+"/add-product",{method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({name:name.value,stock:stock.value,price:price.value})
-}).then(loadProducts);
+// 🔹 RENDER CART
+function renderCart() {
+  let cartDiv = document.getElementById("cart");
+
+  if (!cartDiv) return;
+
+  cartDiv.innerHTML = "";
+
+  cart.forEach(c => {
+    let p = productsData.find(x => x.id === c.id);
+
+    if (!p) return;
+
+    cartDiv.innerHTML += `
+      <div>
+        ${p.name} x ${c.qty} = ₹${p.price * c.qty}
+      </div>
+    `;
+  });
 }
 
-function addToCart(id){
-let i=cart.find(x=>x.id===id);
-if(i)i.qty++; else cart.push({id,qty:1});
-renderCart();
-}
-
-function renderCart(){
-let t=0,h="";
-cart.forEach(c=>{
-let p=productsData.find(x=>x.id===c.id);
-let v=p.price*c.qty;t+=v;
-h+=`${p.name} x${c.qty}=₹${v}<br>`;
-});
-if(billing)billing.innerHTML=h;
-if(totalAmount)totalAmount.innerText="₹"+t;
-}
-
-function sell(){
-fetch(API+"/sell",{method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(cart)}).then(()=>{
-cart=[];loadProducts();loadSales();
-});
-}
-
-function printBill(){
-let w=window.open();
-w.document.write(billing.innerHTML+"<h3>"+totalAmount.innerText+"</h3>");
-w.print();
-}
-
-function downloadPDF(){
-let e=document.createElement("div");
-e.innerHTML=billing.innerHTML+"<h3>"+totalAmount.innerText+"</h3>";
-html2pdf().from(e).save();
-}
-
-function loadSales(){
-fetch(API+"/sales").then(r=>r.json()).then(d=>{
-let total=0,qty=0,labels=[],values=[];
-d.forEach(s=>{
-total+=s.total;qty+=s.qty;
-labels.push(s.name);values.push(s.total);
-});
-if(totalSales)totalSales.innerText="₹"+total;
-if(totalQty)totalQty.innerText=qty;
-if(salesChart)new Chart(salesChart,{type:"bar",
-data:{labels:labels,datasets:[{data:values}]}
-});
-});
-}
-
-if(document.getElementById("productList"))loadProducts();
-if(document.getElementById("salesChart"))loadSales();
+// 🔹 PAGE LOAD
+window.onload = loadProducts;
